@@ -1,0 +1,64 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+
+import CookieConsent from '../components/CookieConsent.astro';
+
+// Import the video file
+import myVideo from '../assets/trip.mp4';
+
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+
+		 <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BBW6FGSFT0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BBW6FGSFT0');
+</script>
+<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1>🧑‍🚀 Living in London</h1>
+			<p>
+				the ultimate launchpad for global adventures—was a stroke of luck. With six airports at your fingertips—Heathrow, Gatwick, Stansted, Luton, City Airport, and Southend-on-Sea—the world truly feels within reach.
+
+There’s nothing like the thrill of travel. Boarding a plane to the unknown, stepping into a new culture, tasting unfamiliar flavors, and hearing stories in accents you’ve never heard before. It’s freedom, curiosity, and discovery all rolled into one.
+
+I believe adventure begins the moment you leave your comfort zone—and I hope this blog sparks that fire in you to chase horizons, meet the unexpected, and experience the world in all its raw, beautiful variety.
+
+<section class="mb-10">
+  <h4 class="text-2xl font-bold mb-2 text-center">🎥 My Top 3</h4>
+  <div class="rounded-xl overflow-hidden shadow-md aspect-video mx-auto max-w-3xl">
+    <video class="w-full h-full" controls>
+      {/* Use the imported variable as the src */}
+      <source src={myVideo} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
+
+			<div class="flex justify-center mt-8">
+  <a href="/blog" class="inline-block px-6 py-3 rounded-2xl bg-blue-100 text-current text-lg shadow-md hover:bg-blue-200 hover:shadow-lg transition duration-300 ease-in-out">
+    🌍 Read the Blog
+  </a>
+</div>
+
+				
+		</main>
+
+		 <CookieConsent /> 
+		<Footer />
+	</body>
+</html>

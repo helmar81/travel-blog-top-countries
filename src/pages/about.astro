@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/BlogPost.astro';
+import Image from '../assets/Helmar.jpg';
+---
+
+<Layout
+  title="About Me"
+  description="Learn more about me, my experience at Amazon, my passion for technology, and my travels to 72 countries."
+  pubDate={new Date('August 08 2021')}
+  
+>
+
+  <img src={Image.src} alt="Helmar Baechle" class="rounded-full w-48 h-48 mx-auto shadow-lg" />
+	 <div class="mx-auto max-w-xl text-justify py-3.5">
+      <p class="text-lg leading-relaxed text-gray-600n justify-around">
+        AS A LEVEL 3 SUPPORT ASSOCIATE FOR AMAZON, I EXCEL AT HANDLING COMPLEX QUERIES AND ESCALATED ISSUES FROM OUR PREMIUM SELLERS. IN MY SPARE TIME, I AM PASSIONATE ABOUT STAYING UP-TO-DATE ON THE LATEST TECHNOLOGIES AND ENJOY BUILDING APPS WITH ASTRO.JS AND SVELTEKIT. WITH A LOVE FOR TRAVEL, I HAVE VISITED 66 COUNTRIES AND BRING A DIVERSE PERSPECTIVE TO MY WORK. WHETHER AT HOME OR ABROAD, I AM ALWAYS SEEKING NEW CHALLENGES AND OPPORTUNITIES TO GROW.
+      </p>
+      <div class="mt-8">
+      
+      </div>
+    </div>
+
+</Layout>
