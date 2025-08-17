@@ -1,0 +1,289 @@
+---
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const flagsDirectory = path.join(__dirname, '../assets/flags');
+let flagFiles: string[] = [];
+
+try {
+  flagFiles = await fs.readdir(flagsDirectory);
+} catch (error) {
+  console.error('Error reading flags directory:', error);
+}
+
+const countryFlags = flagFiles
+  .filter(file => file.endsWith('.png'))
+  .map(file => `/src/assets/flags/${file}`);
+const __base = import.meta.env.BASE_URL;
+---
+
+<div>
+  <div class="container">
+    <div class="section">
+      <h2>All Countries</h2>
+      <div id="all-countries" class="flags-container">
+        <!-- All flags will be loaded here by the script -->
+ {countryFlags.map(flagSrc => {
+ const filename = flagSrc.split('/').pop();
+ const countryCode = filename ? filename.split('.')[0].toUpperCase() : '';
+ return (
+ <div class="flag-item" draggable="true" data-filename={filename}>
+ <img src={flagSrc} alt={`${countryCode} Flag`} width="50" height="30" />
+ <span>{countryCode}</span>
+ </div>
+ );
+ })}
+      </div>
+    </div>
+    <div class="section">
+      <h2>Visited Countries</h2>
+      <div id="visited-countries" class="flags-container drop-zone">
+ <p id="visited-count">Visited: 0</p>
+        <!-- Dropped flags will appear here -->
+      </div>
+    </div>
+  </div>
+  <button id="reset-button">Reset Visited Countries</button>
+</div>
+
+<style>
+  .container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .container {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .section {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .flags-container.all-countries {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .flag-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+ cursor: grab;
+  }
+
+ .flags-container.drop-zone {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+ cursor: grab;
+  }
+
+
+  .drop-zone {
+    min-height: 100px; /* Give the drop zone some visual space */
+    background-color: #f9f9f9;
+  }
+
+  .flags-container img {
+    border: 1px solid #ccc;
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+  }
+</style>
+
+<style>
+ #reset-button {
+    margin-top: 20px;
+ }
+</style>
+
+<script>
+  const countryNames: { [key: string]: string } = {
+    "ad": "Andorra", "ae": "United Arab Emirates", "af": "Afghanistan", "ag": "Antigua and Barbuda", "ai": "Anguilla",
+    "al": "Albania", "am": "Armenia", "ao": "Angola", "aq": "Antarctica", "ar": "Argentina",
+    "as": "American Samoa", "at": "Austria", "au": "Australia", "aw": "Aruba", "ax": "Åland Islands",
+    "az": "Azerbaijan", "ba": "Bosnia and Herzegovina", "bb": "Barbados", "bd": "Bangladesh", "be": "Belgium",
+    "bf": "Burkina Faso", "bg": "Bulgaria", "bh": "Bahrain", "bi": "Burundi", "bj": "Benin",
+    "bl": "Saint Barthélemy", "bm": "Bermuda", "bn": "Brunei Darussalam", "bo": "Bolivia", "bq": "Bonaire, Sint Eustatius and Saba",
+    "br": "Brazil", "bs": "Bahamas", "bt": "Bhutan", "bv": "Bouvet Island", "bw": "Botswana",
+    "by": "Belarus", "bz": "Belize", "ca": "Canada", "cc": "Cocos (Keeling) Islands", "cd": "Congo, Democratic Republic of the",
+    "cf": "Central African Republic", "cg": "Congo", "ch": "Switzerland", "ci": "Côte d'Ivoire", "ck": "Cook Islands",
+    "cl": "Chile", "cm": "Cameroon", "cn": "China", "co": "Colombia", "cr": "Costa Rica",
+    "cu": "Cuba", "cv": "Cabo Verde", "cw": "Curaçao", "cx": "Christmas Island", "cy": "Cyprus",
+    "cz": "Czechia", "de": "Germany", "dj": "Djibouti", "dk": "Denmark", "dm": "Dominica",
+    "do": "Dominican Republic", "dz": "Algeria", "ec": "Ecuador", "ee": "Estonia", "eg": "Egypt",
+    "eh": "Western Sahara", "er": "Eritrea", "es": "Spain", "et": "Ethiopia", "fi": "Finland",
+    "fj": "Fiji", "fk": "Falkland Islands (Malvinas)", "fm": "Micronesia (Federated States of)", "fo": "Faroe Islands", "fr": "France",
+    "ga": "Gabon", "gb": "United Kingdom", "gb-eng": "England", "gb-nir": "Northern Ireland", "gb-sct": "Scotland", "gb-wls": "Wales",
+    "gd": "Grenada", "ge": "Georgia", "gf": "French Guiana", "gg": "Guernsey", "gh": "Ghana",
+    "gi": "Gibraltar", "gl": "Greenland", "gm": "Gambia", "gn": "Guinea", "gp": "Guadeloupe",
+    "gq": "Equatorial Guinea", "gr": "Greece", "gs": "South Georgia and the South Sandwich Islands", "gt": "Guatemala", "gu": "Guam",
+    "gw": "Guinea-Bissau", "gy": "Guyana", "hk": "Hong Kong", "hm": "Heard Island and McDonald Islands", "hn": "Honduras",
+    "hr": "Croatia", "ht": "Haiti", "hu": "Hungary", "id": "Indonesia", "ie": "Ireland",
+    "il": "Israel", "im": "Isle of Man", "in": "India", "io": "British Indian Ocean Territory", "iq": "Iraq",
+    "ir": "Iran (Islamic Republic of)", "is": "Iceland", "it": "Italy", "je": "Jersey", "jm": "Jamaica",
+    "jo": "Jordan", "jp": "Japan", "ke": "Kenya", "kg": "Kyrgyzstan", "kh": "Cambodia",
+    "ki": "Kiribati", "km": "Comoros", "kn": "Saint Kitts and Nevis", "kp": "Korea (Democratic People's Republic of)", "kr": "Korea, Republic of",
+    "kw": "Kuwait", "ky": "Cayman Islands", "kz": "Kazakhstan", "la": "Lao People's Democratic Republic", "lb": "Lebanon",
+    "lc": "Saint Lucia", "li": "Liechtenstein", "lk": "Sri Lanka", "lr": "Liberia", "ls": "Lesotho",
+    "lt": "Lithuania", "lu": "Luxembourg", "lv": "Latvia", "ly": "Libya", "ma": "Morocco",
+    "mc": "Monaco", "md": "Moldova, Republic of", "me": "Montenegro", "mf": "Saint Martin (French part)", "mg": "Madagascar",
+    "mh": "Marshall Islands", "mk": "North Macedonia", "ml": "Mali", "mm": "Myanmar", "mn": "Mongolia",
+    "mo": "Macao", "mp": "Northern Mariana Islands", "mq": "Martinique", "mr": "Mauritania", "ms": "Montserrat",
+    "mt": "Malta", "mu": "Mauritius", "mv": "Maldives", "mw": "Malawi", "mx": "Mexico",
+    "my": "Malaysia", "mz": "Mozambique", "na": "Namibia", "nc": "New Caledonia", "ne": "Niger",
+    "nf": "Norfolk Island", "ng": "Nigeria", "ni": "Nicaragua", "nl": "Netherlands", "no": "Norway",
+    "np": "Nepal", "nr": "Nauru", "nu": "Niue", "nz": "New Zealand", "om": "Oman",
+    "pa": "Panama", "pe": "Peru", "pf": "French Polynesia", "pg": "Papua New Guinea", "ph": "Philippines",
+    "pk": "Pakistan", "pl": "Poland", "pm": "Saint Pierre and Miquelon", "pn": "Pitcairn", "pr": "Puerto Rico",
+    "ps": "Palestine, State of", "pt": "Portugal", "pw": "Palau", "py": "Paraguay", "qa": "Qatar",
+    "re": "Réunion", "ro": "Romania", "rs": "Serbia", "ru": "Russian Federation", "rw": "Rwanda",
+    "sa": "Saudi Arabia", "sb": "Solomon Islands", "sc": "Seychelles", "sd": "Sudan", "se": "Sweden",
+    "sg": "Singapore", "sh": "Saint Helena, Ascension and Tristan da Cunha", "si": "Slovenia", "sj": "Svalbard and Jan Mayen", "sk": "Slovakia",
+    "sl": "Sierra Leone", "sm": "San Marino", "sn": "Senegal", "so": "Somalia", "sr": "Suriname",
+    "ss": "South Sudan", "st": "Sao Tome and Principe", "sv": "El Salvador", "sx": "Sint Maarten (Dutch part)", "sy": "Syrian Arab Republic",
+    "sz": "Eswatini", "tc": "Turks and Caicos Islands", "td": "Chad", "tf": "French Southern Territories", "tg": "Togo",
+    "th": "Thailand", "tj": "Tajikistan", "tk": "Tokelau", "tl": "Timor-Leste", "tm": "Turkmenistan",
+    "tn": "Tunisia", "to": "Tonga", "tr": "Turkey", "tt": "Trinidad and Tobago", "tv": "Tuvalu",
+    "tw": "Taiwan, Province of China", "tz": "Tanzania, United Republic of", "ua": "Ukraine", "ug": "Uganda", "um": "United States Minor Outlying Islands",
+    "us": "United States of America", "uy": "Uruguay", "uz": "Uzbekistan", "va": "Holy See", "vc": "Saint Vincent and the Grenadines",
+    "ve": "Venezuela, Bolivarian Republic of", "vg": "Virgin Islands (British)", "vi": "Virgin Islands (U.S.)", "vn": "Viet Nam", "vu": "Vanuatu",
+    "wf": "Wallis and Futuna", "ws": "Samoa", "xk": "Kosovo", "ye": "Yemen", "yt": "Mayotte",
+    "za": "South Africa", "zm": "Zambia", "zw": "Zimbabwe"
+  };
+
+  function speakCountryName(countryCode: string) {
+    const countryName = countryNames[countryCode.toLowerCase()];
+    if (countryName && 'speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(countryName);
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.warn('Speech synthesis not supported or country name not found.');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const allCountriesContainer = document.getElementById('all-countries');
+    const visitedCountriesContainer = document.getElementById('visited-countries');
+
+
+    if (!allCountriesContainer || !visitedCountriesContainer) {
+      console.error('Country containers not found.');
+      return;
+    }
+
+    const visitedCountElement = document.getElementById('visited-count');
+
+    const updateVisitedCount = () => {
+      if (visitedCountElement) {
+        visitedCountElement.textContent = `Visited: ${visitedCountriesContainer.querySelectorAll('.flag-item').length}`;
+      }
+    };
+
+    const visitedCountries = JSON.parse(localStorage.getItem('visitedCountries') || '[]');
+
+    // Load visited countries from localStorage
+    visitedCountries.forEach((filename) => {
+      const flagElement = allCountriesContainer.querySelector(`.flag-item[data-filename="${filename}"]`);
+      if (flagElement) {
+        visitedCountriesContainer.appendChild(flagElement);
+      }
+    });
+
+    updateVisitedCount(); // Initial count update after loading from storage
+
+
+    // Add dragstart listener to all flags
+    allCountriesContainer.querySelectorAll('.flag-item').forEach(flag => {
+      flag.addEventListener('dragstart', (event) => {
+        if (event.dataTransfer) {
+          event.dataTransfer.setData('text/plain', (event.target as HTMLElement).dataset.filename || '');
+        }
+      });
+    });
+
+    // Add click event listeners to all flags for voiceover
+ allCountriesContainer.querySelectorAll('.flag-item').forEach((flag: HTMLElement) => {
+      flag.addEventListener('click', (event) => {
+        const filename = (event.currentTarget as HTMLElement).dataset.filename;
+        const countryCode = filename ? filename.split('.')[0].toUpperCase() : '';
+        speakCountryName(countryCode);
+      });
+    });
+
+    // Add dragstart listener to flags in visited container as well, so they can be dragged back if needed
+    // (This is a basic implementation; you might want a separate drop zone to move them back)
+    // This part is commented out as it's not part of the core request but is a logical next step.
+    /*
+
+     visitedCountriesContainer.querySelectorAll('img').forEach(flag => {
+      flag.addEventListener('dragstart', (event) => {
+        if (event.dataTransfer) {
+          event.dataTransfer.setData('text/plain', (event.target as HTMLElement).dataset.filename || '');
+        }
+      });
+    });
+    */
+
+    // Add dragover listener to the visited countries container
+    visitedCountriesContainer.addEventListener('dragover', (event) => {
+      event.preventDefault(); // Necessary to allow dropping
+    });
+
+    // Add drop listener to the visited countries container
+    visitedCountriesContainer.addEventListener('drop', (event) => {
+      event.preventDefault();
+      const filename = event.dataTransfer?.getData('text/plain');
+      if (filename) {
+        const draggedElement = allCountriesContainer.querySelector(`.flag-item[data-filename="${filename}"]`);
+        if (draggedElement) {
+          visitedCountriesContainer.appendChild(draggedElement);
+          // Save the updated list to localStorage
+          const currentVisited = Array.from(visitedCountriesContainer.querySelectorAll('img')).map(img => (img as HTMLElement).dataset.filename);
+          localStorage.setItem('visitedCountries', JSON.stringify(currentVisited));
+          updateVisitedCount(); // Update count after drop
+        }
+      }
+    });
+
+    // Add click event listeners to flags in visited container for voiceover
+ visitedCountriesContainer.querySelectorAll('.flag-item').forEach((flag: HTMLElement) => {
+      flag.addEventListener('click', (event) => {
+        const filename = (event.currentTarget as HTMLElement).dataset.filename;
+        const countryCode = filename ? filename.split('.')[0].toUpperCase() : '';
+        speakCountryName(countryCode);
+      });
+    });
+
+
+    const resetButton = document.getElementById('reset-button');
+    if (resetButton) {
+      resetButton.addEventListener('click', () => {
+        localStorage.removeItem('visitedCountries');
+        // Move all flags back to the all-countries section
+        const visitedFlags = visitedCountriesContainer.querySelectorAll('.flag-item');
+        visitedFlags.forEach(flag => {
+          allCountriesContainer.appendChild(flag);
+        });
+        updateVisitedCount(); // Reset count to 0
+      });
+    } else {
+      console.error('Reset button not found.');
+    }
+  });
+</script>

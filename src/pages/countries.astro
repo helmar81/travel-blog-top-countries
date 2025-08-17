@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import CountryFlags from '../components/CountryFlags.astro';
+
+const pageTitle = "Where have you been";
+---
+
+<BaseLayout title={pageTitle}>
+  <main>
+    <h1>{pageTitle}</h1>
+    <CountryFlags />
+  </main>
+</BaseLayout>
